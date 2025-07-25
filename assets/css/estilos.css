@@ -1,0 +1,52 @@
+/* assets/css/estilos.css */
+
+body {
+    background-color: #f5f5f5;
+    font-family: 'Segoe UI', sans-serif;
+    color: #333;
+}
+
+.navbar {
+    background-color: #8A0000 !important;
+}
+
+.navbar .navbar-brand,
+.navbar .btn,
+.navbar a {
+    color: #FFF287 !important;
+}
+
+.navbar .btn-outline-light:hover {
+    background-color: #C83F12;
+    color: #fff;
+    border-color: #C83F12;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.card-title {
+    color: #3B060A;
+    font-weight: bold;
+}
+
+.btn-primary {
+    background-color: #8A0000;
+    border-color: #8A0000;
+}
+
+.btn-primary:hover {
+    background-color: #C83F12;
+    border-color: #C83F12;
+}
+
+footer {
+    font-size: 0.9rem;
+    background-color: #3B060A;
+    color: #FFF287;
+    padding: 10px;
+    text-align: center;
+}
+
