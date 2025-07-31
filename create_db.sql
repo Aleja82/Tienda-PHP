@@ -33,7 +33,30 @@ CREATE TABLE mensajes (
     mensaje TEXT,
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE ventas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_cliente VARCHAR(100) NOT NULL,
+    correo_cliente VARCHAR(100) NOT NULL,
+    metodo_pago VARCHAR(50),
+    tipo_envio VARCHAR(50),
+    costo_envio DECIMAL(10,2),
+    subtotal DECIMAL(10,2),
+    iva DECIMAL(10,2),
+    total DECIMAL(10,2),
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
+-- Tabla detalle_venta
+CREATE TABLE detalle_venta (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    venta_id INT,
+    producto_id INT,
+    nombre_producto VARCHAR(100),
+    precio_unitario DECIMAL(10,2),
+    cantidad INT,
+    subtotal DECIMAL(10,2),
+    FOREIGN KEY (venta_id) REFERENCES ventas(id)
+);
 -- Poblado inciial de categorías
 INSERT INTO categoria (nombre) VALUES
 ('Tecnología'),
