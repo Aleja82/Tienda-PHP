@@ -42,8 +42,22 @@ switch ($action) {
     case 'editar':
         $controller->editar();
         break;
+        case 'verVentas':
+        require_once APP_PATH . "/admin/controlador/VentaController.php";
+        $ventaController = new VentaController();
+        $ventaController->verVentas();
+        break;
+
+    case 'detalleVenta':
+        require_once APP_PATH . "/admin/controlador/VentaController.php";
+        $ventaController = new VentaController();
+        $id = $_GET['id'] ?? null;
+        $ventaController->detalleVenta($id);
+        break;
+
     // ...
     default:
         header("Location: index.php?action=login");
         break;
 }
+
