@@ -1,52 +1,103 @@
 /* assets/css/estilos.css */
 
+/* GLOBAL */
 body {
-    background-color: #f5f5f5;
+    background-color: #0A2540; /* Azul oscuro sofisticado */
     font-family: 'Segoe UI', sans-serif;
-    color: #333;
+    color: #F5F5F5; /* Texto blanco suave */
+    margin: 0;
+    padding: 0;
 }
 
+/* NAVBAR */
 .navbar {
-    background-color: #8A0000 !important;
+    background-color: #0A2540 !important;
+    border-bottom: 2px solid #F36F21; /* Naranja cálido */
 }
 
 .navbar .navbar-brand,
-.navbar .btn,
-.navbar a {
-    color: #FFF287 !important;
-}
-
-.navbar .btn-outline-light:hover {
-    background-color: #C83F12;
-    color: #fff;
-    border-color: #C83F12;
-}
-
-.card {
-    border: none;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-
-.card-title {
-    color: #3B060A;
+.navbar a,
+.navbar .btn {
+    color: #F36F21 !important;
     font-weight: bold;
 }
 
+.navbar .btn-outline-light {
+    border: 1px solid #F36F21;
+    color: #F36F21 !important;
+    transition: all 0.3s ease;
+}
+
+.navbar .btn-outline-light:hover {
+    background-color: #F36F21;
+    color: #0A2540 !important;
+    border-color: #F36F21;
+}
+
+/* BOTONES DE CATEGORÍA */
+.btn-category {
+    border: 1px solid #F36F21;
+    background-color: transparent;
+    color: #F36F21;
+    margin: 4px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-category:hover,
+.btn-category.active {
+    background-color: #F36F21;
+    color: #0A2540;
+}
+
+/* PRODUCTOS */
+.card {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(243, 111, 33, 0.3);
+    transition: transform 0.2s ease-in-out;
+    background-color: #112D4E;
+    color: #F5F5F5;
+}
+
+.card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(243, 111, 33, 0.5);
+}
+
+.card-title {
+    color: #F36F21;
+    font-weight: bold;
+}
+
+/* BOTONES PRINCIPALES */
 .btn-primary {
-    background-color: #8A0000;
-    border-color: #8A0000;
+    background-color: #F36F21;
+    border-color: #F36F21;
+    color: #0A2540;
+    font-weight: bold;
+    transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
-    background-color: #C83F12;
-    border-color: #C83F12;
+    background-color: #D85B18;
+    border-color: #D85B18;
+    color: #0A2540;
 }
 
+/* FOOTER */
 footer {
     font-size: 0.9rem;
-    background-color: #3B060A;
-    color: #FFF287;
-    padding: 10px;
+    background-color: #0A2540;
+    color: #F36F21;
+    padding: 15px;
     text-align: center;
+    margin-top: 50px;
 }
 
+/* TITULOS */
+h1, h2, h3 {
+    color: #F36F21;
+}
