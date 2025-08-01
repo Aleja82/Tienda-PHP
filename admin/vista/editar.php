@@ -21,7 +21,7 @@ if (empty($_SESSION['csrf_token'])) {
             <div class="col-lg-6">
 
                 <!-- Título -->
-                <h2 class="text-center mb-4 fw-bold" style="color: #8A0000;">Editar Producto</h2>
+                <h2 class="text-center mb-4 fw-bold" style="color: #0A2540;">Editar Producto</h2>
 
                 <!-- Formulario -->
                 <form method="POST" action="index.php?action=editar" enctype="multipart/form-data" class="card shadow-lg p-4 border-0">
@@ -67,7 +67,7 @@ if (empty($_SESSION['csrf_token'])) {
                         <a href="index.php?action=listar" class="btn btn-outline-secondary">
                             ← Cancelar
                         </a>
-                        <button type="submit" class="btn" style="background-color: #3B060A; color: #FFF287;">
+                        <button type="submit" class="btn" style="background-color: #0A2540; color: #F36F21;">
                             Guardar Cambios
                         </button>
                     </div>
