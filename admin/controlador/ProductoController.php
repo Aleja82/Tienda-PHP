@@ -1,99 +1,147 @@
 <?php
-require_once __DIR__ . '/../../config/conexion.php';
 
-class ProductoDAO
+require_once APP_PATH . "/admin/modelo/ProductoDAO.php";
+class ProductoController
+{
+    private $modelo;
+
+    public function __construct()
     {
-        private $conexion;
+        $this->modelo = new ProductoDAO();
+    }
 
-        public function __construct()
-        {
-            $this->conexion = Conexion::conectar();
+    private function verificarSesion()
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
         }
-
-        public function insertar($nombre, $precio, $foto, $categoria_id)
-        {
-            $sql = "INSERT INTO productos (nombre, precio, foto, categoria_id) VALUES (?, ?, ?, ?)";
-            $stmt = $this->conexion->prepare($sql);
-            return $stmt->execute([$nombre, $precio, $foto, $categoria_id]);
-        }
-
-        public function listar()
-        {
-            $sql = "SELECT p.id, p.nombre, p.precio, p.foto, c.nombre AS categoria
-                    FROM productos p
-                    INNER JOIN categoria c ON p.categoria_id = c.id
-                    ORDER BY p.id DESC";
-            $stmt = $this->conexion->query($sql);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
-
-        public function eliminar($id)
-        {
-            $stmt = $this->conexion->prepare("SELECT foto FROM productos WHERE id = ?");
-            $stmt->execute([$id]);
-            $foto = $stmt->fetchColumn();
-
-            $stmt = $this->conexion->prepare("DELETE FROM productos WHERE id = ?");
-            $resultado = $stmt->execute([$id]);
-
-            if ($resultado && $foto && file_exists("imagenes/$foto")) {
-                unlink("imagenes/$foto");
-            }
-
-            return $resultado;
-        }
-
-        public function buscarPorId($id)
-        {
-            $sql = "SELECT p.*, c.nombre AS categoria
-                    FROM productos p
-                    INNER JOIN categoria c ON p.categoria_id = c.id
-                    WHERE p.id = ?";
-            $stmt = $this->conexion->prepare($sql);
-            $stmt->execute([$id]);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        }
-
-        public function actualizar($id, $nombre, $precio, $foto, $categoria_id)
-        {
-            try {
-                if ($foto) {
-                    $stmt = $this->conexion->prepare("SELECT foto FROM productos WHERE id = ?");
-                    $stmt->execute([$id]);
-                    $fotoAnterior = $stmt->fetchColumn();
-
-                    $sql = "UPDATE productos SET nombre = ?, precio = ?, foto = ?, categoria_id = ? WHERE id = ?";
-                    $stmt = $this->conexion->prepare($sql);
-                    $resultado = $stmt->execute([$nombre, $precio, $foto, $categoria_id, $id]);
-
-                    if ($resultado && $fotoAnterior && file_exists("imagenes/$fotoAnterior")) {
-                        unlink("imagenes/$fotoAnterior");
-                    }
-
-                    return $resultado;
-
-                } else {
-                    $sql = "UPDATE productos SET nombre = ?, precio = ?, categoria_id = ? WHERE id = ?";
-                    $stmt = $this->conexion->prepare($sql);
-                    return $stmt->execute([$nombre, $precio, $categoria_id, $id]);
-                }
-
-            } catch (PDOException $e) {
-                return false;
-            }
-        }
-
-        public function listarPorCategoria($categoria_id)
-        {
-            $sql = "SELECT p.id, p.nombre, p.precio, p.foto, c.nombre AS categoria
-                    FROM productos p
-                    INNER JOIN categoria c ON p.categoria_id = c.id
-                    WHERE p.categoria_id = ?
-                    ORDER BY p.id DESC";
-            $stmt = $this->conexion->prepare($sql);
-            $stmt->execute([$categoria_id]);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (!isset($_SESSION['usuario'])) {
+            header("Location: index.php?action=login");
+            exit();
         }
     }
 
+    public function registrar()
+    {
+        $this->verificarSesion();
 
+        require_once "modelo/CategoriaDAO.php";
+        $categoriaDAO = new CategoriaDAO();
+        $categorias = $categoriaDAO->listar();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+                die("Token CSRF inválido.");
+            }
+
+            $nombre = trim($_POST['nombre']);
+            $precio = $_POST['precio'];
+            $categoria_id = $_POST['categoria_id'];
+
+            if (empty($nombre) || !is_numeric($precio)) {
+                die("Datos inválidos.");
+            }
+
+            // Validar tipo de archivo
+            $foto = null;
+            $permitidos = ['image/jpeg', 'image/png'];
+            if (isset($_FILES['foto']) && $_FILES['foto']['error'] == 0) {
+                if (!in_array($_FILES['foto']['type'], $permitidos)) {
+                    die("Formato de imagen no permitido.");
+                }
+
+                $nombreArchivo = uniqid() . "_" . basename($_FILES['foto']['name']);
+                $rutaDestino = "../imagenes/" . $nombreArchivo;
+
+                if (move_uploaded_file($_FILES['foto']['tmp_name'], $rutaDestino)) {
+                    $foto = $nombreArchivo;
+                }
+            }
+
+            $this->modelo->insertar($nombre, $precio, $foto, $categoria_id);
+            header("Location: index.php?action=listar");
+            exit();
+        }
+
+        include "vista/formulario.php";
+    }
+
+    public function listar()
+    {
+        $this->verificarSesion();
+
+        $productos = $this->modelo->listar();
+        include "vista/lista.php";
+    }
+
+    public function eliminar()
+    {
+        $this->verificarSesion();
+
+        // ✅ Verificar token desde POST
+        if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+            die("Token CSRF inválido.");
+        }
+
+        if (isset($_GET['id'])) {
+            $id = $_GET['id'];
+            $this->modelo->eliminar($id);
+        }
+
+        header("Location: index.php?action=listar");
+        exit();
+    }
+
+
+    public function editar()
+    {
+        $this->verificarSesion();
+
+        require_once "modelo/CategoriaDAO.php";
+        $categoriaDAO = new CategoriaDAO();
+        $categorias = $categoriaDAO->listar();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+                die("Token CSRF inválido.");
+            }
+
+            $id = $_POST['id'];
+            $nombre = trim($_POST['nombre']);
+            $precio = $_POST['precio'];
+            $categoria_id = $_POST['categoria_id'];
+
+            if (empty($nombre) || !is_numeric($precio)) {
+                die("Datos inválidos.");
+            }
+
+            $producto = $this->modelo->buscarPorId($id);
+
+            $foto = null;
+            $permitidos = ['image/jpeg', 'image/png'];
+            if (isset($_FILES['foto']) && $_FILES['foto']['error'] === 0) {
+                if (!in_array($_FILES['foto']['type'], $permitidos)) {
+                    die("Formato de imagen no permitido.");
+                }
+
+                $nombreArchivo = uniqid() . "_" . basename($_FILES['foto']['name']);
+                $ruta = "../imagenes/" . $nombreArchivo;
+
+                if (move_uploaded_file($_FILES['foto']['tmp_name'], $ruta)) {
+                    if (!empty($producto['foto']) && file_exists("imagenes/" . $producto['foto'])) {
+                        unlink("imagenes/" . $producto['foto']);
+                    }
+                    $foto = $nombreArchivo;
+                }
+            }
+
+            $this->modelo->actualizar($id, $nombre, $precio, $foto, $categoria_id);
+            header("Location: index.php?action=listar");
+            exit();
+        } else {
+            $id = $_GET['id'];
+            $producto = $this->modelo->buscarPorId($id);
+            include "vista/editar.php";
+        }
+    }
+}
