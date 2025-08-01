@@ -49,10 +49,12 @@ switch ($action) {
         $id = $_GET['id'] ?? null;
         $controller->detalleVenta($id);
         break;
+    case 'verVentas':
+    $controller->verVentas();
+    break;
 
     default:
         http_response_code(404);
         echo "Página no encontrada.";
         break;
 }
-
