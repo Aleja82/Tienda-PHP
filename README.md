@@ -113,4 +113,4 @@ Proyecto de e-commerce básico desarrollado con PHP y MySQL, ideal para práctic
 
 ---
  
-**Colaboradores**: @Aleja82! 🚀
+**Colaboradores**: https://github.com/Aleja82! 🚀
