@@ -53,7 +53,7 @@
                     </div>
 
                     <div class="d-grid">
-                        <button type="submit" class="btn" style="background-color: #3B060A; color: #FFF287;">
+                        <button type="submit" class="btn" style="background-color: #0A2540; color: #F36F21;;">
                             Guardar Producto
                         </button>
                     </div>
@@ -70,3 +70,4 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
