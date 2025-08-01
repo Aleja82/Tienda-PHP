@@ -36,7 +36,8 @@
                 </div>
                 <div class="col-md-7">
                     <div class="card-body p-4">
-                        <h3 class="card-title text-uppercase fw-bold" style="color: #8A0000;"><?= htmlspecialchars($producto['nombre']) ?></h3>
+                        <h3 class="card-title text-uppercase fw-bold" style="color: #F36F21;
+Para utilizar este contenido, cite la fuente y enlace al articulo original en https://www.ecuadorlegalonline.com/consultas/agencia-nacional-de-transito/simulador-licencia-tipo-b/;"><?= htmlspecialchars($producto['nombre']) ?></h3>
                         <p class="text-muted mb-2">Categoría: <?= htmlspecialchars($producto['categoria']) ?></p>
                         <h4 class="text-success mb-3">$<?= number_format($producto['precio'], 2) ?></h4>
                         <p class="card-text mb-4">Este producto es parte del catálogo de nuestra tienda virtual. Puedes contactarnos para más detalles o realizar tu pedido.</p>
@@ -56,7 +57,7 @@
     </div>
 
     <!-- FOOTER -->
-    <footer class="text-center py-4 mt-5" style="background-color: #3B060A; color: #FFF287;">
+    <footer class="text-center py-4 mt-5" style="background-color: #F36F21; color: #F36F21;"> 
         <p class="mb-0">© <?= date('Y') ?> Tienda Virtual - Todos los derechos reservados</p>
     </footer>
 
