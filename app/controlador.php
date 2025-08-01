@@ -220,49 +220,44 @@ class Controller
     }
     public function procesarPago()
     {
-        session_start();
-
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header("Location: index.php");
-            exit;
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
         }
 
-        require_once "admin/modelo/ProductoDAO.php";
-        require_once "config/conexion.php";
-
-        $nombre = trim($_POST['nombre'] ?? '');
-        $correo = trim($_POST['correo'] ?? '');
-        $metodo_pago = $_POST['metodo_pago'] ?? '';
-        $tipo_envio = $_POST['tipo_envio'] ?? '';
-
-        if (!$nombre || !$correo || !$metodo_pago || !$tipo_envio) {
-            echo "Datos incompletos.";
-            exit;
-        }
-
-        $envio = 0;
-        switch ($tipo_envio) {
-            case 'local': $envio = 3; break;
-            case 'provincial': $envio = 6; break;
-            case 'nacional': $envio = 8; break;
-            default: $envio = 3;
-        }
-
-        $carrito = $_SESSION['carrito'] ?? [];
-        if (empty($carrito)) {
+        if (!isset($_SESSION['carrito']) || empty($_SESSION['carrito'])) {
             echo "El carrito está vacío.";
             exit;
         }
 
+        require_once "config/conexion.php";
+        require_once "admin/modelo/ProductoDAO.php";
+
+        $pdo = Conexion::conectar();
         $dao = new ProductoDAO();
+
+        // Obtener datos del formulario
+        $nombre = $_POST['nombre'];
+        $correo = $_POST['correo'];
+        $metodo_pago = $_POST['metodo_pago'];
+        $tipo_envio = $_POST['tipo_envio'];
+
+        // Calcular costo de envío
+        $costo_envio = 0;
+        if ($tipo_envio === 'local') $costo_envio = 3;
+        elseif ($tipo_envio === 'provincial') $costo_envio = 6;
+        elseif ($tipo_envio === 'nacional') $costo_envio = 8;
+
+        $carrito = $_SESSION['carrito'];
         $productos = [];
         $subtotal = 0;
 
-        foreach ($carrito as $id => $cantidad) {
-            $producto = $dao->buscarPorId($id);
+        // Armar lista de productos y calcular subtotal
+        foreach ($carrito as $producto_id => $cantidad) {
+            $producto = $dao->buscarPorId($producto_id);
             if ($producto) {
                 $itemSubtotal = $producto['precio'] * $cantidad;
                 $subtotal += $itemSubtotal;
+
                 $productos[] = [
                     'id' => $producto['id'],
                     'nombre' => $producto['nombre'],
@@ -274,70 +269,57 @@ class Controller
         }
 
         $iva = $subtotal * 0.12;
-        $total = $subtotal + $iva + $envio;
+        $total = $subtotal + $iva + $costo_envio;
 
-        try {
-            $pdo = Conexion::conectar();
-            $pdo->beginTransaction();
+        // Guardar en la tabla ventas
+        $stmt = $pdo->prepare("INSERT INTO ventas (nombre_cliente, correo_cliente, metodo_pago, tipo_envio, costo_envio, subtotal, iva, total) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$nombre, $correo, $metodo_pago, $tipo_envio, $costo_envio, $subtotal, $iva, $total]);
 
-            // Insertar en ventas
-            $stmt = $pdo->prepare("INSERT INTO ventas (nombre_cliente, correo_cliente, metodo_pago, tipo_envio, costo_envio, subtotal, iva, total) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$nombre, $correo, $metodo_pago, $tipo_envio, $envio, $subtotal, $iva, $total]);
+        $venta_id = $pdo->lastInsertId();
 
-            $ventaId = $pdo->lastInsertId();
+        // Guardar en detalle_venta
+        $stmt_detalle = $pdo->prepare("INSERT INTO detalle_venta (venta_id, producto_id, nombre_producto, precio_unitario, cantidad, subtotal) VALUES (?, ?, ?, ?, ?, ?)");
 
-            // Insertar detalle_venta
-            $stmtDetalle = $pdo->prepare("INSERT INTO detalle_venta (venta_id, producto_id, nombre_producto, precio_unitario, cantidad, subtotal) VALUES (?, ?, ?, ?, ?, ?)");
-            foreach ($productos as $prod) {
-                $stmtDetalle->execute([
-                    $ventaId,
-                    $prod['id'],
-                    $prod['nombre'],
-                    $prod['precio'],
-                    $prod['cantidad'],
-                    $prod['subtotal']
-                ]);
-            }
-
-            $pdo->commit();
-
-            // Vaciar carrito
-            unset($_SESSION['carrito']);
-
-            // Preparar datos para vista detalle_venta
-            $this->detalleVenta($ventaId);
-
-        } catch (PDOException $e) {
-            $pdo->rollBack();
-            echo "Error al guardar la venta: " . $e->getMessage();
-            exit;
+        foreach ($productos as $prod) {
+            $stmt_detalle->execute([
+                $venta_id,
+                $prod['id'],
+                $prod['nombre'],
+                $prod['precio'],
+                $prod['cantidad'],
+                $prod['subtotal']
+            ]);
         }
-    }
 
-public function detalleVenta($id)
-{
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
+        // Limpiar carrito
+        unset($_SESSION['carrito']);
 
-    if (!isset($_SESSION['usuario'])) {
-        header("Location: index.php?action=login");
+        // Redirigir a detalle de venta
+        header("Location: index.php?action=detalleVenta&id=" . $venta_id);
         exit;
     }
 
-    require_once "config/conexion.php";
-    $pdo = Conexion::conectar();
 
-    $stmt = $pdo->prepare("SELECT * FROM ventas WHERE id = ?");
-    $stmt->execute([$id]);
-    $venta = $stmt->fetch(PDO::FETCH_ASSOC);
+    public function detalleVenta($id)
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
 
-    $stmt = $pdo->prepare("SELECT * FROM detalle_venta WHERE venta_id = ?");
-    $stmt->execute([$id]);
-    $detalles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        require_once "config/conexion.php";
+        $pdo = Conexion::conectar();
 
-    include "vista/detalle_venta.php";
-}
+        $stmt = $pdo->prepare("SELECT * FROM ventas WHERE id = ?");
+        $stmt->execute([$id]);
+        $venta = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $stmt = $pdo->prepare("SELECT * FROM detalle_venta WHERE venta_id = ?");
+        $stmt->execute([$id]);
+        $detalles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        include "vista/detalle_venta.php";
+    }
+
 
 
 }
