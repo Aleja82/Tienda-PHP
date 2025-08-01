@@ -17,7 +17,7 @@
     </nav>
 
     <div class="container py-4">
-        <h1 class="text-center mb-4" style="color: #8A0000;">Formulario de Contacto</h1>
+        <h1 class="text-center mb-4" style="color: #203E5F;">Formulario de Contacto</h1>
 
         <?php if (!empty($errores)): ?>
             <div class="alert alert-danger">
@@ -53,9 +53,14 @@
         </form>
     </div>
 
-    <footer class="text-center py-4 mt-5" style="background-color: #3B060A; color: #FFF287;">
+    <footer class="text-center py-4 mt-5" style="background-color: #203E5F; color: #FFF287;">
         <p class="mb-0">© <?= date('Y') ?> Tienda Virtual</p>
     </footer>
+
+    <!-- JS Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 
     <!-- JS Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
