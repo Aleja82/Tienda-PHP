@@ -18,8 +18,8 @@ $token = $_SESSION['csrf_token'];
 
 <body class="d-flex justify-content-center align-items-center vh-100 bg-light">
 
-    <div class="card shadow-lg p-4 rounded-4" style="max-width: 400px; width: 100%; border: 1px solid #C83F12;">
-        <h2 class="text-center mb-4" style="color: #8A0000;">Acceso Administrativo</h2>
+    <div class="card shadow-lg p-4 rounded-4" style="max-width: 400px; width: 100%; border: 1px solid #F36F21;">
+        <h2 class="text-center mb-4" style="color: #0A2540;">Acceso Administrativo</h2>
 
         <?php if (isset($error)): ?>
             <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
@@ -39,12 +39,12 @@ $token = $_SESSION['csrf_token'];
             <input type="hidden" name="csrf_token" value="<?= $token ?>">
 
             <div class="d-grid">
-                <button type="submit" class="btn" style="background-color: #3B060A; color: #FFF287;">Ingresar</button>
+                <button type="submit" class="btn" style="background-color: #F36F21; color: #0A2540;">Ingresar</button>
             </div>
         </form>
 
         <div class="text-center mt-3">
-            <a href="../index.php" class="text-decoration-none" style="color: #C83F12;">← Volver a la tienda</a>
+            <a href="../index.php" class="text-decoration-none" style="color: #0A2540;">← Volver a la tienda</a>
         </div>
     </div>
 
