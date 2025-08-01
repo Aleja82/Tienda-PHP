@@ -8,7 +8,7 @@
 <body class="bg-light">
 
 <div class="container my-5">
-    <h2 class="text-center text-uppercase mb-4" style="color: #3B060A;">Ventas Registradas</h2>
+    <h2 class="text-center text-uppercase mb-4" style="color: #0A2540;">Ventas Registradas</h2>
 
     <div class="table-responsive">
         <table class="table table-bordered table-hover align-middle">
