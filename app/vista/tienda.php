@@ -34,7 +34,7 @@
 
         <!-- PRODUCTOS -->
         <?php foreach ($agrupados as $categoria => $items): ?>
-            <h2 class="text-center text-uppercase my-4" style="color: #8A0000;"><?= htmlspecialchars($categoria) ?></h2>
+            <h2 class="text-center text-uppercase my-4" style="color: #F36F21;"><?= htmlspecialchars($categoria) ?></h2>
             <div class="row justify-content-center">
                 <?php foreach ($items as $item): ?>
                     <div class="col-md-4 col-lg-3 mb-4">
@@ -58,7 +58,7 @@
     </div>
 
     <!-- FOOTER -->
-    <footer class="text-center py-4 mt-5" style="background-color: #3B060A; color: #FFF287;">
+    <footer class="text-center py-4 mt-5" style="background-color: #456882; color: #D2C1B6;">
         <p class="mb-0">© <?= date('Y') ?> Tienda Virtual - Todos los derechos reservados</p>
     </footer>
 
@@ -67,4 +67,5 @@
 </body>
 
 </html>
+
 
