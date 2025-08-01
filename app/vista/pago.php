@@ -7,7 +7,7 @@
 </head>
 <body class="bg-light">
 <div class="container py-5">
-    <h1 class="text-center mb-4" style="color: #8A0000;">💳 Confirmar Compra</h1>
+    <h1 class="text-center mb-4" style="color: #F36F21;">💳 Confirmar Compra</h1>
 
     <form action="index.php?action=procesarPago" method="POST">
 
