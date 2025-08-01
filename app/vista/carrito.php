@@ -20,7 +20,7 @@
     </nav>
 
     <div class="container py-5">
-        <h1 class="text-center mb-5" style="color: #8A0000;">Tu Carrito de Compras</h1>
+        <h1 class="text-center mb-5" style="color: #F36F21;">Tu Carrito de Compras</h1>
 
         <?php if (empty($productosCarrito)): ?>
             <div class="alert alert-info text-center">
@@ -94,7 +94,7 @@
     </div>
 
     <!-- Footer -->
-    <footer class="text-center py-4 mt-5" style="background-color: #3B060A; color: #FFF287;">
+    <footer class="text-center py-4 mt-5" style="background-color: #203E5F; color: #F36F21;">
         <p class="mb-0">© <?= date('Y') ?> Tienda Virtual</p>
     </footer>
 
@@ -102,3 +102,4 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
