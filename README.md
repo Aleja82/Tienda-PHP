@@ -80,23 +80,37 @@ Este repositorio contiene una tienda virtual construida con **PHP**, **MySQL**, 
 - Se eliminan imágenes antiguas al actualizar o borrar productos.
 - Se mantiene una arquitectura clara y mantenible.
 
+# 🛒 Tienda Virtual
+
+Proyecto de e-commerce básico desarrollado con PHP y MySQL, ideal para prácticas académicas y prototipos de tienda online.
+
+---
+
 ## 📝 Próximos pasos
 
 - Implementar página de **detalle del producto** (ya incluida).
-- Agregar formularios de **contacto** o sistema de **carrito de compras**.
-- Mejorar la seguridad (CSRF, validaciones, permisos).
-- Preparar el proyecto para producción (HTTPS, .htaccess, env).
+- Agregar formularios de **contacto** y sistema de **carrito de compras**.
+- Mejorar la seguridad: CSRF, validaciones, roles y permisos.
+- Preparar el proyecto para producción: HTTPS, `.htaccess`, variables `.env`.
+- Crear la base de datos y estructura inicial:
+  - Categorías
+  - Productos
+  - Usuarios
+  - Mensajes
+  - Ventas y detalle de ventas
+- Insertar datos iniciales (categorías, productos, usuario administrador).
+
+---
 
 ## 📌 Contribuciones
 
 ¡Bienvenidas! Si deseas contribuir:
 
-1. Haz un fork.
-2. Crea una rama `feature/tu-mejora`.
+1. Haz un fork del repositorio.
+2. Crea una rama: `feature/tu-mejora`.
 3. Realiza tus cambios.
-4. Envía tu pull request.
+4. Envía un Pull Request.
 
 ---
-
-Codificado con 💙 para mis estudiantes.  
-Autor: Rodrigo Tufiño <rtufino@ups.edu.ec>
+ 
+**Colaboradores**: @Aleja82! 🚀
