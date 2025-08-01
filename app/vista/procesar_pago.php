@@ -1,93 +1,71 @@
-<?php
-session_start();
-require_once "admin/modelo/ProductoDAO.php";
-require_once "config/conexion.php";
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Resumen de Pago</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nombre = trim($_POST['nombre'] ?? '');
-    $correo = trim($_POST['correo'] ?? '');
-    $metodo_pago = $_POST['metodo_pago'] ?? '';
-    $tipo_envio = $_POST['tipo_envio'] ?? '';
+<div class="container my-5">
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white text-center">
+            <h4 class="mb-0">Resumen de la Compra</h4>
+        </div>
+        <div class="card-body">
+            <h5 class="text-uppercase" style="color:#3B060A;">Datos del Cliente</h5>
+            <p><strong>Nombre:</strong> <?= htmlspecialchars($nombre) ?></p>
+            <p><strong>Correo:</strong> <?= htmlspecialchars($correo) ?></p>
+            <p><strong>Dirección:</strong> <?= htmlspecialchars($direccion) ?></p>
 
-    if (!$nombre || !$correo || !$metodo_pago || !$tipo_envio) {
-        echo "Datos incompletos.";
-        exit;
-    }
+            <hr>
 
-    $envio = 0;
-    switch ($tipo_envio) {
-        case 'local': $envio = 3; break;
-        case 'provincial': $envio = 6; break;
-        case 'nacional': $envio = 8; break;
-        default: $envio = 3;
-    }
+            <h5 class="text-uppercase" style="color:#3B060A;">Detalle del Pedido</h5>
+            <table class="table table-bordered align-middle">
+                <thead class="table-secondary">
+                    <tr>
+                        <th>Producto</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($carrito as $item): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($item['nombre']) ?></td>
+                            <td>$<?= number_format($item['precio'], 2) ?></td>
+                            <td><?= $item['cantidad'] ?></td>
+                            <td>$<?= number_format($item['precio'] * $item['cantidad'], 2) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
 
-    $carrito = $_SESSION['carrito'] ?? [];
-    if (empty($carrito)) {
-        echo "El carrito está vacío.";
-        exit;
-    }
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <p><strong>Método de Pago:</strong> <?= ucfirst($metodo_pago) ?></p>
+                    <p><strong>Envío:</strong> $<?= number_format($costo_envio, 2) ?></p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <h5>Total a Pagar: <span class="text-success">$<?= number_format($total + $costo_envio, 2) ?></span></h5>
+                </div>
+            </div>
 
-    $dao = new ProductoDAO();
-    $productos = [];
-    $subtotal = 0;
+            <form action="index.php?action=confirmarPago" method="post" class="mt-4 text-center">
+                <input type="hidden" name="nombre" value="<?= htmlspecialchars($nombre) ?>">
+                <input type="hidden" name="correo" value="<?= htmlspecialchars($correo) ?>">
+                <input type="hidden" name="direccion" value="<?= htmlspecialchars($direccion) ?>">
+                <input type="hidden" name="metodo_pago" value="<?= htmlspecialchars($metodo_pago) ?>">
+                <input type="hidden" name="costo_envio" value="<?= $costo_envio ?>">
+                <input type="hidden" name="total" value="<?= $total ?>">
 
-    foreach ($carrito as $id => $cantidad) {
-        $producto = $dao->buscarPorId($id);
-        if ($producto) {
-            $itemSubtotal = $producto['precio'] * $cantidad;
-            $subtotal += $itemSubtotal;
-            $productos[] = [
-                'id' => $producto['id'],
-                'nombre' => $producto['nombre'],
-                'precio' => $producto['precio'],
-                'cantidad' => $cantidad,
-                'subtotal' => $itemSubtotal
-            ];
-        }
-    }
+                <button type="submit" class="btn btn-success px-5">✅ Confirmar Pago</button>
+                <a href="index.php?action=verCarrito" class="btn btn-secondary ms-2">🛒 Volver al Carrito</a>
+            </form>
+        </div>
+    </div>
+</div>
 
-    $iva = $subtotal * 0.12;
-    $total = $subtotal + $iva + $envio;
-
-    try {
-        $pdo = Conexion::conectar();
-        $pdo->beginTransaction();
-
-        // Insertar en ventas
-        $stmt = $pdo->prepare("INSERT INTO ventas (nombre_cliente, correo_cliente, metodo_pago, tipo_envio, costo_envio, subtotal, iva, total) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$nombre, $correo, $metodo_pago, $tipo_envio, $envio, $subtotal, $iva, $total]);
-
-        $ventaId = $pdo->lastInsertId();
-
-        // Insertar detalle_venta
-        $stmtDetalle = $pdo->prepare("INSERT INTO detalle_venta (venta_id, producto_id, nombre_producto, precio_unitario, cantidad, subtotal) VALUES (?, ?, ?, ?, ?, ?)");
-        foreach ($productos as $prod) {
-            $stmtDetalle->execute([
-                $ventaId,
-                $prod['id'],
-                $prod['nombre'],
-                $prod['precio'],
-                $prod['cantidad'],
-                $prod['subtotal']
-            ]);
-        }
-
-        $pdo->commit();
-
-        // Vaciar carrito
-        unset($_SESSION['carrito']);
-
-        // Redirigir a página de detalle
-        header("Location: detalle_venta.php?id=$ventaId");
-        exit;
-
-    } catch (PDOException $e) {
-        $pdo->rollBack();
-        echo "Error al guardar la venta: " . $e->getMessage();
-        exit;
-    }
-} else {
-    header("Location: index.php");
-    exit;
-}
+</body>
+</html>
