@@ -21,9 +21,9 @@ if (empty($_SESSION['csrf_token'])) {
 
         <!-- Encabezado: Título + botones -->
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="text-uppercase fw-bold" style="color: #8A0000;">Productos Registrados</h1>
+            <h1 class="text-uppercase fw-bold" style="color: #F36F21;">Productos Registrados</h1>
             <div class="d-flex gap-2">
-                <a href="index.php?action=registrar" class="btn" style="background-color: #3B060A; color: #FFF287;">
+                <a href="index.php?action=registrar" class="btn" style="background-color: #F36F21; color: #0A2540;">
                     + Registrar Nuevo Producto
                 </a>
                 <a href="index.php?action=verVentas" class="btn btn-outline-dark">
@@ -38,7 +38,8 @@ if (empty($_SESSION['csrf_token'])) {
         <!-- Tabla de productos -->
         <div class="table-responsive">
             <table class="table table-hover align-middle shadow-sm border">
-                <thead style="background-color: #3B060A; color: #FFF287;" class="text-center">
+    
+                <thead style="background-color: #F36F21; color: #F36F21;" class="text-center">
                     <tr>
                         <th>ID</th>
                         <th>Foto</th>
